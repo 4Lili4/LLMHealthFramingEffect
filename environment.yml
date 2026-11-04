@@ -17,7 +17,8 @@ dependencies:
   - main::gcsfs
   - conda-forge::rapidfuzz
   - conda-forge::plotly
-  - conda-forge::statmodels
+  - conda-forge::statsmodels
+  - pip
   - pip:
     - torch
     - torchvision
