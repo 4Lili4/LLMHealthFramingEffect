@@ -34,7 +34,7 @@ Departures from the paper and what was not rerun
    have recovered the authors' undocumented implementation. Current choices:
    Full Answer where present; en_core_web_sm; lowercase entities; bracketed
    article IDs; numbers excluding citations; zero overlap for two empty sets.
-   The alternative empty-overlap convention is included in the sensitivity CSV.
+   The alternative convention for citation/number overlap is in the sensitivity CSV.
 
 8. We do not regenerate the LLM responses or evidence-direction judgments.
    The assignment explicitly permits reusing both. We do not rebuild the
@@ -52,6 +52,13 @@ scripts point at the copies. Intermediate response metrics belong in data_post/.
 Final tables, figures and regression results belong in outputs/. All tunable
 model and analysis settings are at the beginning of reproduce.py.
 
-The directory reorganization did not rerun calculations. The stopped independent
-metric run has partial results for six models under data_post/partial_metrics/.
-Existing plots/tables have not yet been refreshed for the new settings.
+Run completion
+--------------
+All eight models are now complete. The previously calculated six models were
+retained, and only the two missing Qwen models were calculated. All 94,208 pairs
+are combined in data_post/response_metrics.csv; the code produces and uses only
+this one processed CSV. The old part files are retired.
+
+reproduce.py calculates tables and regressions; plot.py draws the saved results.
+All final tables and figures in outputs/ have been refreshed for the independently
+calculated metrics and the current rounding, matching, and clustering settings.

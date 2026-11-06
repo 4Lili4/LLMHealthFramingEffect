@@ -6,15 +6,15 @@ LLM Sensitivity to Patient Question Framing in Medical QA*
 Figures 2(b), 3 and 5 independently, while deliberately changing the questionable
 analysis choices listed in [not_replicated.txt](not_replicated.txt).
 
-## Current run status
+## Completed run
 
-The latest change only reorganized files; no analysis was rerun. The active
-text-metric calculation was stopped during the reorganization. Six of eight models
-were completed. Their metric CSVs are preserved separately in
-`data_post/partial_metrics/`; there is no completed `response_metrics.csv` yet.
-The existing tables and figures in `outputs/` are from the earlier analysis and have not been
-regenerated for the new independent metrics or methodological settings. See
-`data_post/run_status.txt`.
+All eight models are complete: 94,208 technical response pairs in the single
+`data_post/response_metrics.csv`. The six previously completed models were
+retained; only the two missing Qwen models were calculated to finish this run.
+The old part files are no longer used or stored in this project.
+
+The code creates and reads one CSV. Final calculations and plots were rerun
+from that combined data, and the rendered table and figures were inspected.
 
 ## Run
 
@@ -25,6 +25,7 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python compute_metrics.py
 .venv/bin/python reproduce.py
+.venv/bin/python plot.py
 ```
 
 `compute_metrics.py` runs pretrained models locally over 188,416 technical
@@ -32,9 +33,10 @@ answers to calculate 94,208 response-pair measurements. This is the slow step.
 Sentence Transformers downloads its model on the first run and selects an
 available GPU or CPU. Model weights are cached in the ignored `tmp/` folder.
 
-`reproduce.py` performs the aggregation, regressions and plotting. Rerun only
-this script when changing analysis settings. Rerun `compute_metrics.py` first
-when changing the text models or extraction settings.
+`reproduce.py` performs the aggregation and regressions and writes CSV/JSON
+results. `plot.py` reads those results and draws the figures and table. Plotting
+can be rerun independently without repeating calculations. Rerun
+`compute_metrics.py` first when changing the text models or extraction settings.
 
 ## Settings
 
@@ -60,7 +62,7 @@ the paper's statistical choices.
 The directory structure is:
 
 - `data_pre/`: supplied input copies.
-- `data_post/`: intermediate data we calculate, including response-pair metrics.
+- `data_post/response_metrics.csv`: the single processed response-pair dataset.
 - `outputs/`: final tables, figures, their CSV values and regression summaries.
 
 All required input files are copied into this project's `data_pre/` directory.
@@ -91,8 +93,8 @@ without this marker are used as supplied.
 - Citation overlap uses bracketed article IDs, splitting comma lists and expanding ranges.
 - Numerical overlap uses integer/decimal strings after removing bracketed citations.
 - Each overlap is the set intersection divided by the set union. Two empty
-  sets score zero by default; the sensitivity output also shows the alternative
-  of scoring them as one.
+  sets score zero by default. For citation and numerical overlap, the sensitivity
+  output also shows the alternative of scoring two empty sets as one.
 
 The paper does not specify all these extraction details, including its spaCy
 model. These are stated reproduction choices, not claims to have recovered an
@@ -126,8 +128,19 @@ reported as a plain-only effect.
 
 ## Results and outputs
 
-`data_post/` holds the calculated pair measurements in `response_metrics.csv`
-once the metric run is complete. Its existing partial files remain preserved.
+`data_post/response_metrics.csv` holds all calculated pair measurements.
 `outputs/` holds PNG/SVG versions of the table and three figures, their CSV
 values, the published-table comparison, sensitivity results and `regressions.json`.
 `not_replicated.txt` recaps the omitted procedures and methodological departures.
+
+## Main results
+
+- Table 3 matches 20 of 32 published cells; the other 12 differ by 0.01.
+  The extraction choices and analytical departures are documented above and
+  in `not_replicated.txt`; the full comparison is in `outputs/table3_comparison.csv`.
+- Figure 2(b): agreement decreases from 75.438745% to 72.370358%.
+- Figure 5, matched reviews and question types: technical agreement decreases
+  from 76.136364% to 71.487603%; plain-language agreement decreases from
+  75.533747% to 71.883609%.
+- The framing-by-language interaction is not significant with review-clustered
+  standard errors (beta 0.052396, SE 0.053689, p 0.329108).

@@ -9,7 +9,7 @@ import spacy
 from sentence_transformers import SentenceTransformer
 
 from reproduce import (
-    DATA_DIR, MODELS, PROCESSED_DATA_DIR, PROJECT_DIR,
+    DATA_DIR, MODELS, PROCESSED_DATA_DIR, PROJECT_DIR, METRICS_FILE,
     EMBEDDING_MODEL, MODEL_REVISION, EMBEDDING_MAX_TOKENS,
     EMBEDDING_BATCH_SIZE, EMBEDDING_CHUNK_SIZE,
     SPACY_MODEL, SPACY_DISABLED_COMPONENTS, NER_BATCH_SIZE, NER_PROCESSES,
@@ -58,6 +58,30 @@ def response_pairs(model, label):
     return pd.DataFrame(rows)
 
 
+def calculate_model_metrics(model, label, encoder, nlp):
+    frame = response_pairs(model, label)
+    texts = frame[["first", "second"]].to_numpy().ravel().tolist()
+    print(f"{label}: extracting entities from {len(texts)} answers", flush=True)
+    entities = [{(ent.text.lower() if LOWERCASE_ENTITIES else ent.text).strip() for ent in doc.ents}
+                for doc in nlp.pipe(texts, batch_size=NER_BATCH_SIZE, n_process=NER_PROCESSES)]
+    refs = [citations(text) for text in texts]
+    # Article IDs are citations, so exclude their brackets before extracting numbers.
+    numbers = [set(NUMBER_PATTERN.findall(CITATION_PATTERN.sub("", text))) for text in texts]
+    embeddings = []
+    for start in range(0, len(texts), EMBEDDING_CHUNK_SIZE):
+        embeddings.append(encoder.encode(texts[start:start+EMBEDDING_CHUNK_SIZE], batch_size=EMBEDDING_BATCH_SIZE,
+                                         normalize_embeddings=True, show_progress_bar=False))
+        print(f"{label}: embedded {min(start+EMBEDDING_CHUNK_SIZE, len(texts))}/{len(texts)} answers", flush=True)
+    embeddings = np.concatenate(embeddings)
+    # A dot product of normalized embeddings is their cosine similarity.
+    frame["cosine"] = np.einsum("ij,ij->i", embeddings[::2], embeddings[1::2])
+    for metric, values in [("entity", entities), ("citation", refs), ("numerical", numbers)]:
+        frame[metric] = [jaccard(a, b) for a, b in zip(values[::2], values[1::2])]
+    for metric, values in [("citation", refs), ("numerical", numbers)]:
+        frame[f"empty_{metric}"] = [not (a or b) for a, b in zip(values[::2], values[1::2])]
+    return frame.drop(columns=["first", "second"])
+
+
 def main():
     PROCESSED_DATA_DIR.mkdir(exist_ok=True)
     encoder = SentenceTransformer(EMBEDDING_MODEL, revision=MODEL_REVISION,
@@ -65,31 +89,12 @@ def main():
     encoder.max_seq_length = EMBEDDING_MAX_TOKENS
     # The paper specifies spaCy but not its model; use its small English NER model.
     nlp = spacy.load(SPACY_MODEL, disable=SPACY_DISABLED_COMPONENTS)
-    output = PROCESSED_DATA_DIR / "response_metrics.csv"
-    for model_number, (model, label) in enumerate(MODELS.items()):
-        frame = response_pairs(model, label)
-        texts = frame[["first", "second"]].to_numpy().ravel().tolist()
-        print(f"{label}: extracting entities from {len(texts)} answers", flush=True)
-        entities = [{(ent.text.lower() if LOWERCASE_ENTITIES else ent.text).strip() for ent in doc.ents}
-                    for doc in nlp.pipe(texts, batch_size=NER_BATCH_SIZE, n_process=NER_PROCESSES)]
-        refs = [citations(text) for text in texts]
-        # Article IDs are citations, so exclude their brackets before extracting numbers.
-        numbers = [set(NUMBER_PATTERN.findall(CITATION_PATTERN.sub("", text))) for text in texts]
-        embeddings = []
-        for start in range(0, len(texts), EMBEDDING_CHUNK_SIZE):
-            embeddings.append(encoder.encode(texts[start:start+EMBEDDING_CHUNK_SIZE], batch_size=EMBEDDING_BATCH_SIZE,
-                                             normalize_embeddings=True, show_progress_bar=False))
-            print(f"{label}: embedded {min(start+EMBEDDING_CHUNK_SIZE, len(texts))}/{len(texts)} answers", flush=True)
-        embeddings = np.concatenate(embeddings)
-        # A dot product of normalized embeddings is their cosine similarity.
-        frame["cosine"] = np.einsum("ij,ij->i", embeddings[::2], embeddings[1::2])
-        for metric, values in [("entity", entities), ("citation", refs), ("numerical", numbers)]:
-            frame[metric] = [jaccard(a, b) for a, b in zip(values[::2], values[1::2])]
-        for metric, values in [("citation", refs), ("numerical", numbers)]:
-            frame[f"empty_{metric}"] = [not (a or b) for a, b in zip(values[::2], values[1::2])]
-        frame.drop(columns=["first", "second"]).to_csv(output, index=False,
-            mode="w" if model_number == 0 else "a", header=model_number == 0)
-        print(f"{label}: saved {len(frame)} independently calculated pairs", flush=True)
+    frames = []
+    for model, label in MODELS.items():
+        frames.append(calculate_model_metrics(model, label, encoder, nlp))
+    # A normal full run creates one CSV containing all eight models.
+    pd.concat(frames, ignore_index=True).to_csv(METRICS_FILE, index=False)
+    print(f"Saved all response metrics to {METRICS_FILE}", flush=True)
 
 
 if __name__ == "__main__":

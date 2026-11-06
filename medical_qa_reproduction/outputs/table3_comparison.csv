@@ -1,0 +1,9 @@
+model,cosine,entity,citation,numerical
+Claude Sonnet 4.5,0.0,0.01,0.0,0.0
+GPT-5.1,0.0,0.0,-0.01,-0.01
+HuatuoGPT-o1 7B,0.0,0.0,-0.01,0.0
+HuatuoGPT-o1 8B,0.0,0.01,-0.0,0.01
+Llama 3.3 70B,0.0,0.0,0.0,0.0
+Llama 4 Maverick 17B,-0.01,0.01,0.0,0.0
+Qwen3 4B,0.0,0.01,0.0,-0.01
+Qwen3 30B,0.01,0.0,-0.01,0.0
