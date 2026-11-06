@@ -8,6 +8,13 @@ Our research questions are:
 - **RQ2: Single-turn vs. Multi-turn Susceptibility.** Are LLMs more susceptible to framing effects under repeated persuasive multi-turn conversations than in single-turn interactions?
 - **RQ3: Technical vs. Plain Language Susceptibility.** Are LLMs more susceptible to framing effects in plain language queries than in technical ones?
 
+## Independent reproduction
+
+The [independent Python reproduction](medical_qa_reproduction/README.md) covers
+Table 3 and Figures 2(b), 3 and 5 using the saved evaluation data. It includes
+plots, CSV results, numerical regression checks, and notes on the rounding and
+analysis populations needed to reproduce the published results.
+
 ## SETUP
 
 Create conda environment from the environment.yml: `conda env create -f environment.yml`

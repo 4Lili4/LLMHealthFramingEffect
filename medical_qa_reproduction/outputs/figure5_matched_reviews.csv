@@ -1,0 +1,19 @@
+group,model,condition,agreements,pairs,agreement_percent
+"Technical, same 363 reviews",Claude Sonnet 4.5,Baseline,557,726,76.72176308539945
+"Technical, same 363 reviews",Claude Sonnet 4.5,Framed,554,726,76.30853994490359
+"Technical, same 363 reviews",GPT-5.1,Baseline,562,726,77.41046831955923
+"Technical, same 363 reviews",GPT-5.1,Framed,526,726,72.45179063360881
+"Technical, same 363 reviews",HuatuoGPT-o1 7B,Baseline,538,726,74.10468319559229
+"Technical, same 363 reviews",HuatuoGPT-o1 7B,Framed,507,726,69.83471074380165
+"Technical, same 363 reviews",HuatuoGPT-o1 8B,Baseline,522,726,71.90082644628099
+"Technical, same 363 reviews",HuatuoGPT-o1 8B,Framed,496,726,68.31955922865014
+"Technical, same 363 reviews",Llama 3.3 70B,Baseline,565,726,77.8236914600551
+"Technical, same 363 reviews",Llama 3.3 70B,Framed,513,726,70.66115702479338
+"Technical, same 363 reviews",Llama 4 Maverick 17B,Baseline,562,726,77.41046831955923
+"Technical, same 363 reviews",Llama 4 Maverick 17B,Framed,526,726,72.45179063360881
+"Technical, same 363 reviews",Qwen3 4B,Baseline,554,726,76.30853994490359
+"Technical, same 363 reviews",Qwen3 4B,Framed,515,726,70.9366391184573
+"Technical, same 363 reviews",Qwen3 30B,Baseline,562,726,77.41046831955923
+"Technical, same 363 reviews",Qwen3 30B,Framed,515,726,70.9366391184573
+"Technical, same 363 reviews",Average,Baseline,4422,5808,76.13636363636364
+"Technical, same 363 reviews",Average,Framed,4152,5808,71.48760330578513

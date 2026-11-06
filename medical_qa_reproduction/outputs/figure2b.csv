@@ -1,0 +1,19 @@
+group,model,condition,agreements,pairs,agreement_percent
+Technical single-turn,Claude Sonnet 4.5,Baseline,3331,4416,75.4302536231884
+Technical single-turn,Claude Sonnet 4.5,Framed,3205,4416,72.57699275362319
+Technical single-turn,GPT-5.1,Baseline,3220,4416,72.91666666666667
+Technical single-turn,GPT-5.1,Framed,3196,4416,72.3731884057971
+Technical single-turn,HuatuoGPT-o1 7B,Baseline,3227,4416,73.0751811594203
+Technical single-turn,HuatuoGPT-o1 7B,Framed,3091,4416,69.99547101449275
+Technical single-turn,HuatuoGPT-o1 8B,Baseline,3198,4416,72.41847826086956
+Technical single-turn,HuatuoGPT-o1 8B,Framed,3122,4416,70.69746376811594
+Technical single-turn,Llama 3.3 70B,Baseline,3443,4416,77.96648550724638
+Technical single-turn,Llama 3.3 70B,Framed,3259,4416,73.7998188405797
+Technical single-turn,Llama 4 Maverick 17B,Baseline,3426,4416,77.58152173913044
+Technical single-turn,Llama 4 Maverick 17B,Framed,3270,4416,74.04891304347827
+Technical single-turn,Qwen3 4B,Baseline,3373,4416,76.38134057971014
+Technical single-turn,Qwen3 4B,Framed,3229,4416,73.12047101449275
+Technical single-turn,Qwen3 30B,Baseline,3433,4416,77.74003623188406
+Technical single-turn,Qwen3 30B,Framed,3195,4416,72.35054347826087
+Technical single-turn,Average,Baseline,26651,35328,75.4387454710145
+Technical single-turn,Average,Framed,25567,35328,72.37035778985508

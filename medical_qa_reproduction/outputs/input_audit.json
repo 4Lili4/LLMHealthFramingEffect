@@ -1,0 +1,738 @@
+[
+  {
+    "file": "code/outputs/baseline_evaluation/claude_4.5_sonnet_eval_results.json",
+    "sha256": "6e15783e51e2e814f3417fe34d5ddd493c86a99b86fc3991cfa7eec44f06d069",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2140,
+      "uncertain": 5555,
+      "lower": 2288,
+      "same": 1793
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/claude_4.5_sonnet_eval_results.json",
+    "sha256": "6b5809e2f3e3402c2776a51c5b6d2fb7b818b91c5f951d91128fcd4d1ff9647a",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2294,
+      "uncertain": 5319,
+      "lower": 2439,
+      "same": 1724
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/claude_4.5_sonnet_eval_results_simplified.json",
+    "sha256": "6288e6bd1189f9f23061d0e5204da49b47ba9887b1037e6a60625628c4653435",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 356,
+      "lower": 322,
+      "uncertain": 529,
+      "same": 245
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/claude_4.5_sonnet_eval_results_simplified.json",
+    "sha256": "5b7658d349dd43775917d4ef772a8072b028e34d25bce0b055642a7ea78fe290",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 363,
+      "lower": 330,
+      "uncertain": 523,
+      "same": 236
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/gpt-5.1_eval_results.json",
+    "sha256": "61b86eb244d6bc94c3e9c40e481039bd3a99a2833d9d10a8f85dbedb5aceec27",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2658,
+      "uncertain": 4533,
+      "lower": 2703,
+      "same": 1882
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/gpt-5.1_eval_results.json",
+    "sha256": "5e4e9af044515a08b59430282d1e89fb8b282089ed642bcbdedae96325d3628b",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2642,
+      "uncertain": 4550,
+      "lower": 2733,
+      "same": 1851
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/gpt-5.1_eval_results_simplified.json",
+    "sha256": "d689f55a06e15e012cfc56656ff0de85f956a89c925a0ac31f21f3f587774825",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 376,
+      "lower": 331,
+      "uncertain": 514,
+      "same": 231
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/gpt-5.1_eval_results_simplified.json",
+    "sha256": "3ed4c578ab5f9371546b63bb60e1497a8059f479119a6df6878d8e015ac3932c",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 382,
+      "lower": 302,
+      "uncertain": 550,
+      "same": 218
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/huatuo-7B_eval_results.json",
+    "sha256": "bbdaede886524c8e0b7b61e339c3268c832e0f3934fbe82e84d1492242b7b41a",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1835,
+      "same": 1113,
+      "uncertain": 6349,
+      "lower": 2479
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/huatuo-7B_eval_results.json",
+    "sha256": "59cf9c2263cecdbf8d73cb4ed69a223ea66db12c275fb438830e036f638514c3",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1848,
+      "uncertain": 6213,
+      "same": 1301,
+      "lower": 2414
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/huatuo-7B_eval_results_simplified.json",
+    "sha256": "9df966a13be852ca7fe2f4ea6c03a75266e846ef7a551cb05e65547e878940d7",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "uncertain": 738,
+      "higher": 269,
+      "lower": 315,
+      "same": 130
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/huatuo-7B_eval_results_simplified.json",
+    "sha256": "42b01827274ab5b3e285c88be4bda006d86de84206858c2b9eed616d90df7669",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "uncertain": 740,
+      "higher": 258,
+      "lower": 292,
+      "same": 162
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/huatuo-8B_eval_results.json",
+    "sha256": "751cb6ee64657c8fde4009aa2484dff7dc01a47d5bddc203f7bff6ea0cad9470",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1857,
+      "uncertain": 6322,
+      "lower": 2388,
+      "same": 1209
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/huatuo-8B_eval_results.json",
+    "sha256": "879f0921d86476b0fb0bcd3cd8586a06c3b8e9c9681990405143fb191775f7e1",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1794,
+      "uncertain": 6344,
+      "lower": 2304,
+      "same": 1334
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/huatuo-8B_eval_results_simplified.json",
+    "sha256": "d02c7eef79a6f9b311768d86feb9adb1644fb42f8c01dcdfbcd82466e7f30e6f",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 274,
+      "uncertain": 726,
+      "lower": 315,
+      "same": 137
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/huatuo-8B_eval_results_simplified.json",
+    "sha256": "8075f70887283f09c1ad11e6c6d9364f12e8c5d595e0318e5146a2f0602d4328",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 278,
+      "uncertain": 721,
+      "lower": 289,
+      "same": 164
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/api-llama3.3_eval_results.json",
+    "sha256": "f62f5c938b6625b58a956859655b56ced5fa77f45bb68e637095376b45f90e8f",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1658,
+      "uncertain": 6903,
+      "lower": 2187,
+      "same": 1028
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/api-llama3.3_eval_results.json",
+    "sha256": "30936f2b04274f4ca2a50485a4c2f59906094178b813f649c56e3366847962be",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1648,
+      "uncertain": 6913,
+      "lower": 2144,
+      "same": 1071
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/api-llama3.3_eval_results_simplified.json",
+    "sha256": "856f338944de4dac4d1ffac37ef05d984e7b3da81e6c61af25344d83addd3d34",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 276,
+      "uncertain": 735,
+      "lower": 302,
+      "same": 139
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/api-llama3.3_eval_results_simplified.json",
+    "sha256": "b461a335a88c72a6ffedd5bd4f6b4cc18febe929a26a21f7f5a1f663c07bf9ac",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 259,
+      "uncertain": 775,
+      "lower": 257,
+      "same": 161
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/api-llama4_eval_results.json",
+    "sha256": "24d56a50aab43eff8d5a17b3d95fd21d9bff502d68c44b80b04b9281adae4511",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1947,
+      "uncertain": 6357,
+      "lower": 2338,
+      "same": 1134
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/api-llama4_eval_results.json",
+    "sha256": "67e09ebc9d0b3c817d526837dc176e5e84a5f41162d8090421556a4caa272513",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 1925,
+      "uncertain": 6385,
+      "lower": 2292,
+      "same": 1174
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/api-llama4_eval_results_simplified.json",
+    "sha256": "25634487362469ddd4c3640b0a6011a5bbfe21ddf152ac7c60eb2d8637afe1c1",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 308,
+      "uncertain": 648,
+      "lower": 325,
+      "same": 171
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/api-llama4_eval_results_simplified.json",
+    "sha256": "73d866a3acdc61c20bd0037667e5b17f6405f7a664294063457c2c7dcf5f906a",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 307,
+      "lower": 301,
+      "uncertain": 660,
+      "same": 184
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/qwen3-4B_eval_results.json",
+    "sha256": "29c79c1b0340a6fdca5bb18f893237b0053eed7b02558a86dff7d44219115188",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2160,
+      "uncertain": 5451,
+      "same": 1765,
+      "lower": 2400
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/qwen3-4B_eval_results.json",
+    "sha256": "0613df0d9c4eab33bcba6e8c8b6ce3e4277ba6642589a2453dab5067da4cd3ec",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2141,
+      "uncertain": 5350,
+      "same": 1786,
+      "lower": 2499
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/qwen3-4B_eval_results_simplified.json",
+    "sha256": "41357680676b89f334688b9ced6bf293c66f53f8d9e06b76031e74575712e5df",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 345,
+      "uncertain": 561,
+      "lower": 333,
+      "same": 213
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/qwen3-4B_eval_results_simplified.json",
+    "sha256": "deb1f19d21290e208b57d0a11d2837571dcac4124ce7a899750cd948be6d1e99",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 321,
+      "uncertain": 571,
+      "same": 259,
+      "lower": 301
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/qwen3-30B_eval_results.json",
+    "sha256": "90b57f7b4e3c1724f3c03a985d006520deaf7f808c5ff1bbe96b6c3f81e4ccf0",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2442,
+      "uncertain": 5077,
+      "lower": 2690,
+      "same": 1567
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/qwen3-30B_eval_results.json",
+    "sha256": "56527c3b01a74d5e3ee87c4fdf9b40d1ae2cfc8101c1092b1a304bf6ca88ff71",
+    "pairs": 5888,
+    "reviews": 368,
+    "templates": {
+      "effectiveness": 368,
+      "efficacy": 368,
+      "safety": 368,
+      "studies": 368,
+      "timepressure": 368,
+      "cost": 368,
+      "family": 368,
+      "friend": 368,
+      "testimonials": 368,
+      "journals": 368,
+      "ai": 368,
+      "doctor": 368,
+      "multiturn-0": 368,
+      "multiturn-1": 368,
+      "multiturn-2": 368,
+      "multiturn-3": 368
+    },
+    "labels": {
+      "higher": 2430,
+      "uncertain": 5137,
+      "lower": 2639,
+      "same": 1570
+    }
+  },
+  {
+    "file": "code/outputs/baseline_evaluation/qwen3-30B_eval_results_simplified.json",
+    "sha256": "427bde21b645611879a7bc06e5847b6e3274d8b9fd6933bf78b76fb08133593f",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "uncertain": 519,
+      "higher": 385,
+      "lower": 341,
+      "same": 207
+    }
+  },
+  {
+    "file": "code/outputs/evaluation/qwen3-30B_eval_results_simplified.json",
+    "sha256": "78053bf6c21fac0f560f4d1c544acd69e2f47e38b34eab9fa2bee5be23041062",
+    "pairs": 726,
+    "reviews": 363,
+    "templates": {
+      "effectiveness": 363,
+      "efficacy": 363
+    },
+    "labels": {
+      "higher": 365,
+      "uncertain": 521,
+      "lower": 338,
+      "same": 228
+    }
+  }
+]

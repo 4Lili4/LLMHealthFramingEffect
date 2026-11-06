@@ -1,0 +1,37 @@
+group,model,condition,agreements,pairs,agreement_percent
+Plain Language,Claude Sonnet 4.5,Baseline,535,726,73.69146005509641
+Plain Language,Claude Sonnet 4.5,Framed,541,726,74.51790633608816
+Plain Language,GPT-5.1,Baseline,540,726,74.3801652892562
+Plain Language,GPT-5.1,Framed,520,726,71.62534435261708
+Plain Language,HuatuoGPT-o1 7B,Baseline,534,726,73.55371900826447
+Plain Language,HuatuoGPT-o1 7B,Framed,516,726,71.07438016528926
+Plain Language,HuatuoGPT-o1 8B,Baseline,523,726,72.03856749311295
+Plain Language,HuatuoGPT-o1 8B,Framed,506,726,69.6969696969697
+Plain Language,Llama 3.3 70B,Baseline,563,726,77.54820936639119
+Plain Language,Llama 3.3 70B,Framed,522,726,71.90082644628099
+Plain Language,Llama 4 Maverick 17B,Baseline,572,726,78.78787878787878
+Plain Language,Llama 4 Maverick 17B,Framed,531,726,73.14049586776859
+Plain Language,Qwen3 4B,Baseline,555,726,76.44628099173553
+Plain Language,Qwen3 4B,Framed,507,726,69.83471074380165
+Plain Language,Qwen3 30B,Baseline,565,726,77.8236914600551
+Plain Language,Qwen3 30B,Framed,532,726,73.27823691460055
+Plain Language,Average,Baseline,4387,5808,75.53374655647383
+Plain Language,Average,Framed,4175,5808,71.883608815427
+Technical,Claude Sonnet 4.5,Baseline,564,736,76.6304347826087
+Technical,Claude Sonnet 4.5,Framed,563,736,76.4945652173913
+Technical,GPT-5.1,Baseline,569,736,77.30978260869566
+Technical,GPT-5.1,Framed,533,736,72.41847826086956
+Technical,HuatuoGPT-o1 7B,Baseline,548,736,74.45652173913044
+Technical,HuatuoGPT-o1 7B,Framed,515,736,69.97282608695652
+Technical,HuatuoGPT-o1 8B,Baseline,530,736,72.01086956521739
+Technical,HuatuoGPT-o1 8B,Framed,502,736,68.20652173913044
+Technical,Llama 3.3 70B,Baseline,574,736,77.98913043478261
+Technical,Llama 3.3 70B,Framed,520,736,70.65217391304348
+Technical,Llama 4 Maverick 17B,Baseline,569,736,77.30978260869566
+Technical,Llama 4 Maverick 17B,Framed,532,736,72.28260869565217
+Technical,Qwen3 4B,Baseline,561,736,76.22282608695652
+Technical,Qwen3 4B,Framed,522,736,70.92391304347827
+Technical,Qwen3 30B,Baseline,570,736,77.44565217391305
+Technical,Qwen3 30B,Framed,520,736,70.65217391304348
+Technical,Average,Baseline,4485,5888,76.171875
+Technical,Average,Framed,4207,5888,71.45040760869566

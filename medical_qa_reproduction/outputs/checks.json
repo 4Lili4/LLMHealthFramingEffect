@@ -1,0 +1,15 @@
+{
+  "table3_cells_matching": 32,
+  "table3_cells_total": 32,
+  "inputs": 32,
+  "pairs": 105824,
+  "all_labels_valid": true,
+  "condition_pair_ids_match": true,
+  "figure3_lowest_odds_ratio": "Effectiveness",
+  "figure3_intervals_crossing_one": [
+    "Family Anecdote",
+    "Online Journals",
+    "Efficacy",
+    "Cost"
+  ]
+}
