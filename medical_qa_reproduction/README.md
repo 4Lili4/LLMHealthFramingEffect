@@ -9,14 +9,13 @@ No author scripts or notebooks were read, imported or executed, and nothing in
 
 ## Run
 
-From this folder, create an environment, install the plotting dependency, and run.
+From this folder, create an environment, install the dependencies, and run.
 The default input is the repository's `code/outputs/` directory:
 
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python reproduce.py
-.venv/bin/python verify.py
 ```
 
 The script reads directly from `code/outputs/evaluation/` and
@@ -25,9 +24,10 @@ The script reads directly from `code/outputs/evaluation/` and
 `reproduce.py`; there are no path-search fallbacks or command-line options.
 The generated results are already included in `outputs/`; opening them does not
 require installation.
-The only direct third-party dependency is Matplotlib; the calculations use
-Python's standard library. The numerical verification uses NumPy, which is
-installed as a Matplotlib dependency.
+Pandas handles grouping, means, counts and CSV exports. Statsmodels fits the
+logistic regressions and calculates standard errors, p-values and confidence
+intervals. Matplotlib draws the figures; NumPy exponentiates the regression
+results to obtain odds ratios.
 
 ## What is independently calculated
 
@@ -50,7 +50,7 @@ The figures use only supplied evidence-direction labels, as the assignment allow
 
 ## Samples and agreement
 
-The script validates 32 input JSON files containing 105,824 evaluated response
+The script reads 32 input JSON files containing 105,824 evaluated response
 pairs across eight models, two language styles and two framing conditions.
 The two conditions have identical pair IDs within each model/style.
 
@@ -81,12 +81,10 @@ For example, GPT-5.1 citation overlap has a full-precision difference of about
 -0.00744. Rounding that difference gives -0.01. The condition means instead
 both round to 0.93, giving the published 0.00.
 
-`table3.csv`, `table3.md` and `table3.png` reproduce the published display.
+`table3.csv` and `table3.png` reproduce the published display.
 `table3_full_precision.csv` preserves differences without premature rounding;
 `table3_condition_means.csv` preserves each mean. `table3_sensitivity.csv`
 also reports the alternative empty-set convention (one) and single-turn scope.
-The 32 paper reference cells in the script are comparison targets only and never
-supply the computed results.
 
 ## Figure 2(b)
 
@@ -119,9 +117,10 @@ odds ratio = exp(beta)
 95% CI = exp(beta +/- 1.959964*SE)
 ```
 
-These are the exact maximum-likelihood coefficient and ordinary standard error
-for logistic regression with an intercept and one binary predictor; numerical
-optimization is unnecessary. The plot uses a logarithmic odds-ratio axis and
+These formulas describe the coefficient and ordinary standard error for logistic
+regression with an intercept and one binary predictor. The script obtains them
+with `statsmodels.formula.api.logit`, using `agreement ~ framed`. Language
+interactions use `agreement ~ framed * plain`. The plot uses a logarithmic odds-ratio axis and
 sorts types by their calculated odds ratio, reproducing the supplied ordering
 and plotted point/interval locations.
 
@@ -174,15 +173,15 @@ uncertainty estimates. Repeated observations from the same review/model are
 not independent; these are reproductions of that analysis, not new estimates
 using clustered standard errors.
 
-## Outputs and validation
+## Outputs
 
 `outputs/` contains PNG and SVG versions of all four requested artifacts, CSVs
-of their underlying values, `regressions.json`, `checks.json`, and
-`input_audit.json` with sample counts, label counts and SHA-256 hashes of all
-32 input files. Input paths are relative to the repository root.
-All four rendered artifacts were visually inspected.
-`verify.py` independently checks the closed-form regression results against
-numerical binomial logistic maximum likelihood and inverse Fisher information.
+of their underlying values and `regressions.json`. The script analyzes this
+fixed dataset directly, without input-validation scaffolding or a second
+regression implementation. The simplified version was compared with the
+previous results: all 32 Table 3 cells match, and all 21 saved regression
+specifications agree to numerical precision. All four rendered artifacts were
+visually inspected.
 Figures are replotted from data; supplied picture files are used only as visual
 references and are not read by the script.
 

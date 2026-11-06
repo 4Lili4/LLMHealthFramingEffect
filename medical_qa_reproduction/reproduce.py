@@ -1,32 +1,20 @@
 #!/usr/bin/env python3
-"""Independent reproduction of Table 3 and Figures 2(b), 3 and 5.
+"""Reproduce Table 3 and Figures 2(b), 3 and 5 from the saved evaluation data."""
 
-Reads only the supplied pair-level evaluation JSON files, never author code or
-recomputed_analysis/. See README.md for the feature-reuse boundary and methods.
-"""
-
-import csv
-import hashlib
 import json
-import math
-import os
-from collections import Counter
 from pathlib import Path
-from statistics import mean
 
-PROJECT_DIR = Path(__file__).resolve().parent
-REPO_DIR = PROJECT_DIR.parent
-# The saved judgments are already in the repository; no path discovery is needed.
-DATA_DIR = REPO_DIR / "code" / "outputs"
-OUTPUT_DIR = PROJECT_DIR / "outputs"
-
-# Keep Matplotlib's writable cache inside this project.
-os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_DIR / "tmp" / "matplotlib"))
-os.environ.setdefault("XDG_CACHE_HOME", str(PROJECT_DIR / "tmp" / "cache"))
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, FormatStrFormatter
+import numpy as np
+import pandas as pd
+import statsmodels.formula.api as smf
+
+PROJECT_DIR = Path(__file__).resolve().parent
+DATA_DIR = PROJECT_DIR.parent / "code" / "outputs"
+OUTPUT_DIR = PROJECT_DIR / "outputs"
 
 MODELS = {
     "claude_4.5_sonnet": "Claude Sonnet 4.5",
@@ -48,164 +36,94 @@ TYPES = {
 METRICS = ("cosine", "entity", "citation", "numerical")
 CONDITIONS = ("Baseline", "Framed")
 TWO_TYPES = {"effectiveness", "efficacy"}
-VALID_TEMPLATES = set(TYPES) | {f"multiturn-{i}" for i in range(4)}
-LABELS = {"higher", "lower", "same", "uncertain"}
-Z95 = 1.959963984540054
-# Transcribed from Table 3 for comparison only; never used in calculations.
-PAPER_TABLE3 = [
-    [-.02, -.06, -.01, -.08], [-.01, -.01, .00, -.02],
-    [-.01, -.02, -.02, -.01], [-.01, -.02, .00, -.02],
-    [-.02, -.06, -.01, -.06], [-.01, -.07, -.02, -.06],
-    [-.03, -.09, -.04, -.04], [-.03, -.06, -.02, -.04],
-]
 
 
 def jaccard(first, second):
-    """Distinct shared tokens / all distinct tokens; two empty sets score zero."""
+    """Shared distinct tokens / all distinct tokens; empty pairs score zero."""
     a, b = set(first), set(second)
     return len(a & b) / len(a | b) if a | b else 0.0
 
 
-def write_csv(path, rows):
-    with path.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
-
-
 def load_data():
-    """Read one row per response pair, plus a manifest of the 32 input files."""
-    rows, audit = [], []
-    for model in MODELS:
-        for style, suffix, expected in [("Technical", "", 5888),
-                                         ("Plain Language", "_simplified", 726)]:
-            key_sets = []
-            # Baseline pairs two positive answers; Framed pairs positive/negative.
+    """Turn the supplied response pairs into one DataFrame."""
+    rows = []
+    for model, label in MODELS.items():
+        for style, suffix in [("Technical", ""), ("Plain Language", "_simplified")]:
             for condition, folder in [("Baseline", "baseline_evaluation"),
                                       ("Framed", "evaluation")]:
                 path = DATA_DIR / folder / f"{model}_eval_results{suffix}.json"
-                raw = path.read_bytes()
-                pairs = json.loads(raw)
-                if len(pairs) != expected:
-                    raise ValueError(f"Unexpected sample size: {path}: {len(pairs)}")
-                key_sets.append(set(pairs))
-                directions, templates, reviews = Counter(), Counter(), set()
-                for key, pair in pairs.items():
-                    # Example ID: CD002818_effectiveness.
+                for key, pair in json.loads(path.read_text()).items():
                     review, template = key.split("_", 1)
                     first = pair["first_response_metrics"]
                     second = pair["second_response_metrics"]
-                    a, b = first["evidence_direction"], second["evidence_direction"]
-                    if a not in LABELS or b not in LABELS:
-                        raise ValueError(f"Invalid/missing evidence label at {path}:{key}")
-                    if template not in VALID_TEMPLATES:
-                        raise ValueError(f"Unknown template: {template}")
-                    directions.update([a, b])
-                    templates.update([template])
-                    reviews.add(review)
-                    comparison = pair["comparison"]
-                    # Reuse saved cosine/entity scores; recalculate the two overlaps.
-                    scores = {
-                        "cosine": comparison["cosine_similarity"],
-                        "entity": comparison["entity_jaccard_similarity"],
+                    # Saved cosine/entity scores are reused; overlaps are recalculated.
+                    rows.append({
+                        "model": label, "style": style, "condition": condition,
+                        "review": review, "template": template,
+                        "framed": int(condition == "Framed"),
+                        "plain": int(style == "Plain Language"),
+                        # Equal 'uncertain' judgments also count as agreement.
+                        "agreement": int(first["evidence_direction"] == second["evidence_direction"]),
+                        "cosine": pair["comparison"]["cosine_similarity"],
+                        "entity": pair["comparison"]["entity_jaccard_similarity"],
                         "citation": jaccard(first["unique_references"], second["unique_references"]),
                         "numerical": jaccard(first["numerical_instances"], second["numerical_instances"]),
-                    }
-                    # Saved float32 cosine scores can exceed 1 by a few ulps.
-                    if not all(math.isfinite(v) and -1.000001 <= v <= 1.000001 for v in scores.values()):
-                        raise ValueError(f"Invalid score at {path}:{key}")
-                    # Matching 'uncertain' labels count as agreement too.
-                    rows.append(dict(model=model, style=style, condition=condition,
-                                     review=review, template=template,
-                                     agreement=int(a == b), **scores,
-                                     empty_citation=not (first["unique_references"] or second["unique_references"]),
-                                     empty_numerical=not (first["numerical_instances"] or second["numerical_instances"])))
-                audit.append(dict(file=path.relative_to(REPO_DIR).as_posix(), sha256=hashlib.sha256(raw).hexdigest(),
-                                  pairs=len(pairs), reviews=len(reviews),
-                                  templates=dict(templates), labels=dict(directions)))
-            if key_sets[0] != key_sets[1]:
-                raise ValueError(f"Baseline/Framed pair IDs differ: {model}, {style}")
-    return rows, audit
+                        "empty_citation": not (first["unique_references"] or second["unique_references"]),
+                        "empty_numerical": not (first["numerical_instances"] or second["numerical_instances"]),
+                    })
+    return pd.DataFrame(rows)
 
 
-def select(rows, **filters):
-    """Keep rows matching every requested field, e.g. style='Technical'."""
-    return [r for r in rows if all(r[k] == v for k, v in filters.items())]
+def differences(means):
+    """Framed minus Baseline for each model's mean scores."""
+    return means.xs("Framed", level="condition") - means.xs("Baseline", level="condition")
 
 
-def metric_means(rows, empty=0):
-    """Mean scores by framing condition, with an optional empty-set sensitivity."""
-    result = {}
-    for condition in CONDITIONS:
-        subset = select(rows, condition=condition)
-        # Stored overlap is zero for empty sets. Adding one tests the alternative.
-        result[condition] = {
-            metric: mean(r[metric] + (empty if r.get(f"empty_{metric}", False) else 0)
-                         for r in subset)
-            for metric in METRICS
-        }
-    return result
+def logistic_regression(data, formula, term):
+    """Let statsmodels calculate the coefficient, uncertainty and significance."""
+    fit = smf.logit(formula, data=data).fit(disp=False)
+    low, high = fit.conf_int().loc[term]
+    return {
+        "beta": fit.params[term], "se": fit.bse[term],
+        "z": fit.tvalues[term], "p": fit.pvalues[term],
+        "odds_ratio": np.exp(fit.params[term]),
+        "ci_low": np.exp(low), "ci_high": np.exp(high),
+    }
 
 
-def counts(rows):
-    """Return numbers of agreeing and disagreeing pairs."""
-    a = sum(r["agreement"] for r in rows)
-    return a, len(rows) - a
-
-
-def logistic_effect(baseline, framed):
-    """Exact MLE for logit(P(agreement)) = intercept + beta * framed.
-
-    With a binary predictor this is a saturated two-cell binomial model:
-    beta is the log odds ratio and its variance is the sum of inverse counts.
-    This is the ordinary, unclustered logistic regression used in the paper.
-    """
-    c, d = counts(baseline)
-    a, b = counts(framed)
-    if min(a, b, c, d) == 0:
-        raise ValueError("A zero cell requires a different estimator; no correction applied")
-    beta = math.log((a * d) / (b * c))
-    se = math.sqrt(1/a + 1/b + 1/c + 1/d)
-    z = beta / se
-    return dict(baseline_agree=c, baseline_total=c+d, framed_agree=a,
-                framed_total=a+b, beta=beta, se=se, z=z,
-                p=math.erfc(abs(z) / math.sqrt(2)), odds_ratio=math.exp(beta),
-                ci_low=math.exp(beta-Z95*se), ci_high=math.exp(beta+Z95*se))
-
-
-def effect_for(rows):
-    return logistic_effect(select(rows, condition="Baseline"), select(rows, condition="Framed"))
+def framing_effect(data, predictor="framed"):
+    """Fit the two-group comparison and include its agreement counts."""
+    counts = data.groupby(predictor)["agreement"].agg(["sum", "size"])
+    return {
+        "baseline_agree": int(counts.loc[0, "sum"]),
+        "baseline_total": int(counts.loc[0, "size"]),
+        "framed_agree": int(counts.loc[1, "sum"]),
+        "framed_total": int(counts.loc[1, "size"]),
+        **logistic_regression(data, f"agreement ~ {predictor}", predictor),
+    }
 
 
 def interaction(technical, plain):
-    """Framed x Plain coefficient in saturated 2x2 logistic regression."""
-    t, p = effect_for(technical), effect_for(plain)
-    # The interaction is the difference between the two language-specific effects.
-    beta = p["beta"] - t["beta"]
-    se = math.hypot(t["se"], p["se"])
-    return dict(beta=beta, se=se, z=beta/se,
-                p=math.erfc(abs(beta/se)/math.sqrt(2)))
+    # The interaction tests whether the framing effect differs by language style.
+    return logistic_regression(pd.concat([technical, plain]),
+                               "agreement ~ framed * plain", "framed:plain")
 
 
-def rate_rows(rows, group):
-    """Agreement percentages per model and pooled across all eight models."""
-    result = []
-    for model in [*MODELS, "Average"]:
-        model_rows = rows if model == "Average" else select(rows, model=model)
-        for condition in CONDITIONS:
-            subset = select(model_rows, condition=condition)
-            a, b = counts(subset)
-            result.append(dict(group=group, model=MODELS.get(model, model),
-                               condition=condition, agreements=a, pairs=a+b,
-                               agreement_percent=100*a/(a+b)))
-    return result
+def rate_rows(data, group):
+    """Agreement percentages by model, followed by the pooled average."""
+    models = data.groupby(["model", "condition"], sort=False)["agreement"].agg(
+        agreements="sum", pairs="size").reset_index()
+    average = data.groupby("condition", sort=False)["agreement"].agg(
+        agreements="sum", pairs="size").reset_index().assign(model="Average")
+    rates = pd.concat([models, average], ignore_index=True)
+    rates["group"] = group
+    rates["agreement_percent"] = 100 * rates["agreements"] / rates["pairs"]
+    return rates[["group", "model", "condition", "agreements", "pairs", "agreement_percent"]].to_dict("records")
 
 
 def save_plot(fig, name):
-    fig.savefig(OUTPUT_DIR / f"{name}.png", dpi=200, bbox_inches="tight")
-    svg = OUTPUT_DIR / f"{name}.svg"
-    fig.savefig(svg, bbox_inches="tight")
-    svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
+    for extension in ["png", "svg"]:
+        fig.savefig(OUTPUT_DIR / f"{name}.{extension}", dpi=200, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -292,87 +210,68 @@ def make_figures(figure2b, figure3, figure5, table):
 
 
 def main():
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    rows, audit = load_data()
-    # Figure 2(b) excludes conversation turns. Figure 5 also limits question types.
-    technical = select(rows, style="Technical")
-    single = [r for r in technical if r["template"] in TYPES]
-    technical_two = [r for r in technical if r["template"] in TWO_TYPES]
-    plain = select(rows, style="Plain Language")
-    assert len(rows) == 105824 and len(single) == 70656
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    data = load_data()
+    technical = data[data["style"] == "Technical"]
+    single = technical[technical["template"].isin(TYPES)]
+    technical_two = technical[technical["template"].isin(TWO_TYPES)]
+    plain = data[data["style"] == "Plain Language"]
 
-    # Table 3: all 16 technical templates, including the four conversation turns.
-    table, full, means, sensitivities = [], [], [], []
-    for i, (model, label) in enumerate(MODELS.items()):
-        model_rows = select(technical, model=model)
-        mu = metric_means(model_rows)
-        full.append(dict(model=label, **{k: mu["Framed"][k]-mu["Baseline"][k] for k in METRICS}))
-        # The published table rounds each mean BEFORE subtracting the conditions.
-        rounded = {k: round(round(mu["Framed"][k], 2)-round(mu["Baseline"][k], 2), 2)
-                   for k in METRICS}
-        table.append(dict(model=label, **rounded))
-        if list(rounded.values()) != PAPER_TABLE3[i]:
-            raise AssertionError(f"Table 3 differs from paper: {model}")
-        for c in CONDITIONS:
-            means.append(dict(model=label, condition=c,
-                              pairs=len(select(model_rows, condition=c)), **mu[c]))
-        # Expose both empty-set conventions and both template scopes.
-        model_single = [r for r in model_rows if r["template"] in TYPES]
-        for scope, population in [("all technical", model_rows), ("single-turn technical", model_single)]:
-            for empty in [0, 1]:
-                avg = mu if scope == "all technical" and empty == 0 else metric_means(population, empty)
-                sensitivities.append(dict(model=label, scope=scope, empty_union=empty,
-                    **{k: avg["Framed"][k]-avg["Baseline"][k] for k in METRICS}))
+    # Table 3 includes all 16 technical templates, including conversation turns.
+    grouped = technical.groupby(["model", "condition"], sort=False)
+    means = grouped[list(METRICS)].mean()
+    full = differences(means)
+    # The published table rounds each mean BEFORE subtracting the conditions.
+    table = differences(means.round(2)).round(2)
+    condition_means = means.join(grouped.size().rename("pairs")).reset_index()
+
+    # Report how the overlap convention and single-turn restriction change Table 3.
+    sensitivities = []
+    for scope, population in [("all technical", technical), ("single-turn technical", single)]:
+        for empty in [0, 1]:
+            adjusted = population.copy()
+            for metric in ["citation", "numerical"]:
+                adjusted[metric] += empty * adjusted[f"empty_{metric}"]
+            avg = adjusted.groupby(["model", "condition"], sort=False)[list(METRICS)].mean()
+            sensitivities.append(differences(avg).reset_index().assign(scope=scope, empty_union=empty))
 
     figure2b = rate_rows(single, "Technical single-turn")
-    figure3 = [dict(template=t, question_type=label,
-               **effect_for(select(single, template=t))) for t, label in TYPES.items()]
-    figure3.sort(key=lambda r: r["odds_ratio"])
+    figure3 = [dict(template=template, question_type=label,
+                    **framing_effect(single[single["template"] == template]))
+               for template, label in TYPES.items()]
+    figure3.sort(key=lambda row: row["odds_ratio"])
+    # Figure 5 compares only Effectiveness and Efficacy, the two shared types.
     figure5 = rate_rows(plain, "Plain Language") + rate_rows(technical_two, "Technical")
-    # Extra sensitivity: match the technical review IDs to available plain-language IDs.
-    plain_ids = {r["review"] for r in plain}
-    matched = [r for r in technical_two if r["review"] in plain_ids]
-    matched_f5 = rate_rows(matched, "Technical, same 363 reviews")
-    # Keep both RQ3 populations: the paper's statistics and plot use different scopes.
+    matched = technical_two[technical_two["review"].isin(plain["review"])]
+    shared_types = pd.concat([technical_two, plain])
+
+    # Keep both RQ3 populations to explain the discrepancy in the paper's statistics.
     regressions = {
-        "rq1_all_technical": effect_for(technical),
-        "rq1_single_turn_technical": effect_for(single),
-        "rq3_plain_only": effect_for(plain),
-        "rq3_technical_two_types": effect_for(technical_two),
-        "rq3_pooled_two_types": effect_for(technical_two + plain),
-        "rq3_language_main_effect_pooled_conditions": logistic_effect(technical_two, plain),
+        "rq1_all_technical": framing_effect(technical),
+        "rq1_single_turn_technical": framing_effect(single),
+        "rq3_plain_only": framing_effect(plain),
+        "rq3_technical_two_types": framing_effect(technical_two),
+        "rq3_pooled_two_types": framing_effect(shared_types),
+        "rq3_language_main_effect_pooled_conditions": framing_effect(shared_types, "plain"),
         "rq3_interaction_two_types": interaction(technical_two, plain),
         "rq3_interaction_all_technical": interaction(technical, plain),
         "rq3_interaction_same_reviews_two_types": interaction(matched, plain),
     }
-    checks = dict(table3_cells_matching=32, table3_cells_total=32,
-                  inputs=len(audit), pairs=len(rows),
-                  all_labels_valid=True, condition_pair_ids_match=True,
-                  figure3_lowest_odds_ratio=figure3[0]["question_type"],
-                  figure3_intervals_crossing_one=[r["question_type"] for r in figure3
-                                                 if r["ci_low"] <= 1 <= r["ci_high"]])
-    for filename, data in [("table3.csv", table), ("table3_full_precision.csv", full),
-                           ("table3_condition_means.csv", means),
-                           ("table3_sensitivity.csv", sensitivities), ("figure2b.csv", figure2b),
-                           ("figure3.csv", figure3), ("figure5.csv", figure5),
-                           ("figure5_matched_reviews.csv", matched_f5)]:
-        write_csv(OUTPUT_DIR / filename, data)
-    for filename, data in [("input_audit.json", audit), ("regressions.json", regressions),
-                           ("checks.json", checks)]:
-        (OUTPUT_DIR / filename).write_text(json.dumps(data, indent=2) + "\n")
-    md = ["| Model | Cosine | Entity | Citation | Numerical |",
-          "|---|---:|---:|---:|---:|"]
-    md += ["| " + r["model"] + " | " + " | ".join(f"{r[k]:.2f}" for k in METRICS) + " |"
-           for r in table]
-    (OUTPUT_DIR / "table3.md").write_text("\n".join(md) + "\n")
-    make_figures(figure2b, figure3, figure5, table)
-    print(json.dumps(checks, indent=2))
-    for name, values in [("Figure 2(b)", figure2b), ("Figure 5", figure5)]:
-        print(name)
-        for r in values:
-            if r["model"] == "Average":
-                print(f'  {r["group"]}, {r["condition"]}: {r["agreement_percent"]:.6f}%')
-    print(f"Outputs: {OUTPUT_DIR}")
+    tables = {
+        "table3": table.reset_index(),
+        "table3_full_precision": full.reset_index(),
+        "table3_condition_means": condition_means[["model", "condition", "pairs", *METRICS]],
+        "table3_sensitivity": pd.concat(sensitivities)[["model", "scope", "empty_union", *METRICS]],
+        "figure2b": pd.DataFrame(figure2b),
+        "figure3": pd.DataFrame(figure3),
+        "figure5": pd.DataFrame(figure5),
+        "figure5_matched_reviews": pd.DataFrame(rate_rows(matched, "Technical, same 363 reviews")),
+    }
+    for name, frame in tables.items():
+        frame.to_csv(OUTPUT_DIR / f"{name}.csv", index=False)
+    (OUTPUT_DIR / "regressions.json").write_text(json.dumps(regressions, indent=2) + "\n")
+    make_figures(figure2b, figure3, figure5, table.reset_index().to_dict("records"))
+    print(f"Results saved to {OUTPUT_DIR}")
 
 
 if __name__ == "__main__":
