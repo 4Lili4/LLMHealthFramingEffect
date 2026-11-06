@@ -19,11 +19,12 @@ python3 -m venv .venv
 .venv/bin/python verify.py
 ```
 
+The script reads directly from `code/outputs/evaluation/` and
+`code/outputs/baseline_evaluation/`, relative to the repository root. It writes to
+`medical_qa_reproduction/outputs/`. These paths are defined at the top of
+`reproduce.py`; there are no path-search fallbacks or command-line options.
 The generated results are already included in `outputs/`; opening them does not
-require installation. The script also supports the original assignment bundle:
-`python reproduce.py --bundle /path/to/reproduction_bundle --out outputs`.
-`--bundle` accepts a repository root, an assignment bundle containing `dataset/`,
-or a directory containing the two evaluation folders directly.
+require installation.
 The only direct third-party dependency is Matplotlib; the calculations use
 Python's standard library. The numerical verification uses NumPy, which is
 installed as a Matplotlib dependency.
@@ -178,7 +179,7 @@ using clustered standard errors.
 `outputs/` contains PNG and SVG versions of all four requested artifacts, CSVs
 of their underlying values, `regressions.json`, `checks.json`, and
 `input_audit.json` with sample counts, label counts and SHA-256 hashes of all
-32 input files. Input paths are relative to the selected repository/bundle root.
+32 input files. Input paths are relative to the repository root.
 All four rendered artifacts were visually inspected.
 `verify.py` independently checks the closed-form regression results against
 numerical binomial logistic maximum likelihood and inverse Fisher information.

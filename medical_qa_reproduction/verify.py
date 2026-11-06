@@ -7,10 +7,14 @@ import numpy as np
 
 
 def fit(design, successes, totals):
-    x, a, n = map(lambda v: np.asarray(v, dtype=float), (design, successes, totals))
+    """Fit grouped-binomial logistic regression with Newton's method."""
+    x = np.asarray(design, dtype=float)
+    a = np.asarray(successes, dtype=float)
+    n = np.asarray(totals, dtype=float)
     beta = np.zeros(x.shape[1])
     for _ in range(100):
         p = 1 / (1 + np.exp(-(x @ beta)))
+        # The score gives the update direction; Fisher information scales it.
         fisher = x.T @ ((n*p*(1-p))[:, None] * x)
         step = np.linalg.solve(fisher, x.T @ (a-n*p))
         beta += step
@@ -19,14 +23,18 @@ def fit(design, successes, totals):
     else:
         raise AssertionError("Numerical MLE did not converge")
     p = 1 / (1 + np.exp(-(x @ beta)))
+    # The inverse information matrix gives coefficient variances.
     covariance = np.linalg.inv(x.T @ ((n*p*(1-p))[:, None]*x))
     return beta, np.sqrt(np.diag(covariance))
 
 
 out = Path(__file__).parent / "outputs"
 regressions = json.loads((out / "regressions.json").read_text())
+with (out / "figure3.csv").open() as f:
+    question_effects = list(csv.DictReader(f))
 checked = 0
-for row in [*regressions.values(), *csv.DictReader((out / "figure3.csv").open())]:
+# Refit each saved two-group result numerically, independent of the closed form.
+for row in [*regressions.values(), *question_effects]:
     if "baseline_agree" not in row:
         continue
     beta, se = fit([[1, 0], [1, 1]],
