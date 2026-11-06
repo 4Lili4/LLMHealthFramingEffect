@@ -11,7 +11,8 @@ Our research questions are:
 ## Independent reproduction
 
 The [independent Python reproduction](medical_qa_reproduction/README.md) covers
-Table 3 and Figures 2(b), 3 and 5 using the saved evaluation data. It includes
+Table 3 and Figures 2(b), 3 and 5 using the generated responses and supplied
+evidence-direction judgments. It recalculates text measurements and includes
 plots, CSV results, statsmodels regressions, and notes on the rounding and
 analysis populations needed to reproduce the published results.
 

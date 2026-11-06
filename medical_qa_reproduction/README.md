@@ -1,191 +1,133 @@
-# Independent medical QA reproduction
+# Independent reproduction and reanalysis
 
-This folder reproduces Table 3 and Figures 2(b), 3 and 5 from *This Treatment
-Works, Right? Evaluating LLM Sensitivity to Patient Question Framing in Medical
-QA* (Yun et al., arXiv:2604.05051v1), using the paper and supplied evaluation data.
-All analysis code was written independently from the methods in the paper.
-No author scripts or notebooks were read, imported or executed, and nothing in
-`dataset/recomputed_analysis/` is used.
+This project analyzes RQ1 and RQ3 from *This Treatment Works, Right? Evaluating
+LLM Sensitivity to Patient Question Framing in Medical QA*
+([paper, v1](https://arxiv.org/abs/2604.05051v1)). It calculates Table 3 and
+Figures 2(b), 3 and 5 independently, while deliberately changing the questionable
+analysis choices listed in [not_replicated.txt](not_replicated.txt).
+
+## Current run status
+
+The latest change only reorganized files; no analysis was rerun. The active
+text-metric calculation was stopped during the reorganization. Six of eight models
+were completed. Their metric CSVs are preserved separately in
+`data_post/partial_metrics/`; there is no completed `response_metrics.csv` yet.
+The existing tables and figures in `outputs/` are from the earlier analysis and have not been
+regenerated for the new independent metrics or methodological settings. See
+`data_post/run_status.txt`.
 
 ## Run
 
-From this folder, create an environment, install the dependencies, and run.
-The default input is the repository's `code/outputs/` directory:
+From this folder:
 
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python compute_metrics.py
 .venv/bin/python reproduce.py
 ```
 
-The script reads directly from `code/outputs/evaluation/` and
-`code/outputs/baseline_evaluation/`, relative to the repository root. It writes to
-`medical_qa_reproduction/outputs/`. These paths are defined at the top of
-`reproduce.py`; there are no path-search fallbacks or command-line options.
-The generated results are already included in `outputs/`; opening them does not
-require installation.
-Pandas handles grouping, means, counts and CSV exports. Statsmodels fits the
-logistic regressions and calculates standard errors, p-values and confidence
-intervals. Matplotlib draws the figures; NumPy exponentiates the regression
-results to obtain odds ratios.
+`compute_metrics.py` runs pretrained models locally over 188,416 technical
+answers to calculate 94,208 response-pair measurements. This is the slow step.
+Sentence Transformers downloads its model on the first run and selects an
+available GPU or CPU. Model weights are cached in the ignored `tmp/` folder.
 
-## What is independently calculated
+`reproduce.py` performs the aggregation, regressions and plotting. Rerun only
+this script when changing analysis settings. Rerun `compute_metrics.py` first
+when changing the text models or extraction settings.
 
-- All evidence agreement indicators, percentages, aggregations and plots.
-- Citation and numerical Jaccard similarities, calculated from the supplied
-  per-response `unique_references` and `numerical_instances` lists as sets.
-- Table 3 condition means and differences.
-- Logistic regression coefficients, standard errors, odds ratios, normal Wald
-  confidence intervals, two-sided p-values and language interactions.
+## Settings
 
-**Feature reuse boundary:** Table 3 uses the supplied pair-level
-`cosine_similarity` and `entity_jaccard_similarity` measurements. It does not
-regenerate PubMedBERT embeddings or run spaCy entity extraction. It also uses
-the supplied citation/number token lists rather than re-extracting them from
-response text. The paper names PubMedBERT and spaCy but does not fully specify
-the embedding/extraction pipeline, including the spaCy model/version and the
-empty-set convention. This is an independent reproduction of the analyses from
-the supplied evaluation measurements, not a reproduction of all feature extraction.
-The figures use only supplied evidence-direction labels, as the assignment allows.
+Model names, model revision, sequence limit, inference batch sizes, spaCy
+settings, extraction regexes, overlap convention, regression formulas,
+confidence level and analysis switches are at the beginning of `reproduce.py`.
+`compute_metrics.py` imports these settings instead of maintaining a second copy.
 
-## Samples and agreement
+The default analysis differs from the paper in three explicit ways:
 
-The script reads 32 input JSON files containing 105,824 evaluated response
-pairs across eight models, two language styles and two framing conditions.
-The two conditions have identical pair IDs within each model/style.
-
-Technical data contain 368 reviews x 16 templates = 5,888 pairs per model and
-condition. Twelve templates are single-turn; the other four are successive
-turns in the multi-turn conversation. Plain-language data contain 363 reviews x
-two templates = 726 pairs per model and condition. No labels are missing or
-outside the four permitted categories.
-
-A pair agrees if its labels are exactly equal, including `uncertain` paired
-with `uncertain`. Uncertain judgments are not dropped. Baseline compares two
-positive responses; Framed compares positive and negative responses. Different
-labels indicate disagreement, which need not be a direct higher/lower contradiction.
-All models have the same sample size in each plotted population, so the pooled
-rate equals the unweighted mean of the eight model rates.
-
-## Table 3
-
-All **32 of 32 published cells match**, using all 16 technical templates.
-Two otherwise unspecified conventions are needed to reproduce the display:
-
-1. If both citation sets or number sets are empty, their Jaccard score is zero.
-2. Round each condition mean to two decimals, then subtract Framed minus Baseline.
-
-These conventions were inferred by comparing the independently calculated
-results with the published table; they are not explicitly stated in the paper.
-For example, GPT-5.1 citation overlap has a full-precision difference of about
--0.00744. Rounding that difference gives -0.01. The condition means instead
-both round to 0.93, giving the published 0.00.
-
-`table3.csv` and `table3.png` reproduce the published display.
-`table3_full_precision.csv` preserves differences without premature rounding;
-`table3_condition_means.csv` preserves each mean. `table3_sensitivity.csv`
-also reports the alternative empty-set convention (one) and single-turn scope.
-
-## Figure 2(b)
-
-This uses only the 12 single-turn technical question types: 4,416 pairs per
-model/condition, or 35,328 per condition across all eight models.
-
-| Condition | Agreements / pairs | Average agreement |
-|---|---:|---:|
-| Baseline | 26,651 / 35,328 | 75.438745% |
-| Framed | 25,567 / 35,328 | 72.370358% |
-
-The 3.068387 percentage point decrease and all eight model lines agree with the
-supplied figure. The single-turn logistic coefficient is -0.159243, SE 0.017156,
-z -9.282035, matching the paper's reported -0.159 and -9.28.
-Across all technical templates, the coefficient is -0.219429, SE 0.014906,
-z -14.721261, also matching the RQ1 text.
-
-## Figure 3
-
-For each question type, pool the eight models and calculate the framing effect
-on binary agreement, independently of the other types. Each condition has
-2,944 pairs per question type.
-
-For Framed agreement/disagreement counts a,b and Baseline counts c,d:
-
-```
-beta = log((a*d)/(b*c))
-SE = sqrt(1/a + 1/b + 1/c + 1/d)
-odds ratio = exp(beta)
-95% CI = exp(beta +/- 1.959964*SE)
+```python
+ROUND_CONDITION_MEANS = False  # subtract full-precision means before rounding
+MATCH_LANGUAGE_REVIEWS = True # same reviews and question types in both styles
+CLUSTER_BY_REVIEW = True      # account for repeated observations per review
 ```
 
-These formulas describe the coefficient and ordinary standard error for logistic
-regression with an intercept and one binary predictor. The script obtains them
-with `statsmodels.formula.api.logit`, using `agreement ~ framed`. Language
-interactions use `agreement ~ framed * plain`. The plot uses a logarithmic odds-ratio axis and
-sorts types by their calculated odds ratio, reproducing the supplied ordering
-and plotted point/interval locations.
+These switches allow controlled comparisons without altering the response text
+measurements. Their defaults produce a reanalysis, not an exact replication of
+the paper's statistical choices.
 
-Effectiveness has the smallest odds ratio: 0.673053, 95% CI approximately
-[0.599414, 0.755738]. All 12 point estimates are below one. However, the intervals
-for Family Anecdote, Online Journals, Efficacy and Cost include one: the data do
-not support a separate statistically significant effect for every type at 5%.
-The original figure also shows these intervals crossing one.
+## Data and reuse boundary
 
-## Figure 5 and the RQ3 scope discrepancy
+The directory structure is:
 
-The technical series must be restricted to Effectiveness and Efficacy, the only
-two types present in plain language. Keep all 368 technical reviews and 363
-plain-language reviews to match the figure.
+- `data_pre/`: supplied input copies.
+- `data_post/`: intermediate data we calculate, including response-pair metrics.
+- `outputs/`: final tables, figures, their CSV values and regression summaries.
 
-| Language | Baseline | Framed | Change, percentage points |
-|---|---:|---:|---:|
-| Plain language | 75.533747% | 71.883609% | -3.650138 |
-| Technical | 76.171875% | 71.450408% | -4.721467 |
+All required input files are copied into this project's `data_pre/` directory.
+The originals under the repository's `code/outputs/` remain unchanged.
+Both scripts read the copies:
 
-These match the supplied Figure 5. The paper's text gives approximately 76.1%
-for technical Baseline; the underlying value here would round to 76.2% at one
-decimal, a small textual discrepancy.
+- `data_pre/responses/`: eight technical response files, with positive/negative pairs.
+- `data_pre/baseline_responses/`: eight files containing two positive responses per pair.
+- `data_pre/evaluation/` and `data_pre/baseline_evaluation/`: 32 files containing the
+  supplied technical/plain-language evidence-direction judgments.
+- `data_pre/paper_table3.csv`: the published table, transcribed for comparison only.
 
-The surrounding regression results appear to use different populations:
+Only generated answer text, review/question IDs and evidence-direction labels
+are reused. Saved cosine scores, entity scores, citation lists and number lists
+are not used. No author analysis scripts or notebooks are imported or executed.
 
-| Specification | beta | SE | p |
-|---|---:|---:|---:|
-| Plain language only, framing effect | -0.188589 | 0.042232 | 0.00000799 |
-| Both language styles, two types pooled, framing effect | -0.216815 | 0.029797 | 3.43e-13 |
-| Language main effect, two types, conditions pooled | -0.005294 | 0.029724 | 0.858642 |
-| Framing x language, two types in both styles | 0.056176 | 0.059598 | 0.345896 |
-| Framing x language, all 16 technical types vs two plain types | 0.030840 | 0.044786 | 0.491066 |
+## Independently calculated text measurements
 
-The paper labels approximately -0.216, SE 0.030, z -7.28 as the framing effect
-within plain language. Those values instead closely match pooling the two
-language styles for the two shared types (z = -7.276356); they do not match the
-plain-only calculation. The reported interaction p = 0.491 is reproduced by
-including all technical types, whereas Figure 5 uses only the two shared types.
-This is evidence of inconsistent analysis populations/reporting, inferred from
-the numerical matches; the intended regression population is not fully specified.
+`compute_metrics.py` analyzes the `Full Answer` section where present. Answers
+without this marker are used as supplied.
 
-Either interaction specification gives no statistically significant interaction,
-so the paper's main RQ3 conclusion is unchanged. Restricting technical data to
-the same 363 reviews as plain language also gives a nonsignificant interaction
-(p = 0.380922); the additional counts are in `figure5_matched_reviews.csv`.
+- Cosine similarity uses [NeuML/pubmedbert-base-embeddings](https://huggingface.co/NeuML/pubmedbert-base-embeddings),
+  identified through the paper's Mezzetti (2023) reference. The revision is pinned;
+  inference uses float32, mean pooling and a 512-token limit. Cosine is the dot
+  product of normalized embeddings.
+- Entity overlap uses [spaCy's en_core_web_sm 3.8.0](https://spacy.io/models/en#en_core_web_sm).
+  All entity types are included and their surface text is lowercased.
+- Citation overlap uses bracketed article IDs, splitting comma lists and expanding ranges.
+- Numerical overlap uses integer/decimal strings after removing bracketed citations.
+- Each overlap is the set intersection divided by the set union. Two empty
+  sets score zero by default; the sensitivity output also shows the alternative
+  of scoring them as one.
 
-The regression calculations reproduce the paper's ordinary unclustered
-uncertainty estimates. Repeated observations from the same review/model are
-not independent; these are reproductions of that analysis, not new estimates
-using clustered standard errors.
+The paper does not specify all these extraction details, including its spaCy
+model. These are stated reproduction choices, not claims to have recovered an
+undocumented implementation. They are not tuned to force agreement with the paper.
 
-## Outputs
+## Analyses
 
-`outputs/` contains PNG and SVG versions of all four requested artifacts, CSVs
-of their underlying values and `regressions.json`. The script analyzes this
-fixed dataset directly, without input-validation scaffolding or a second
-regression implementation. The simplified version was compared with the
-previous results: all 32 Table 3 cells match, and all 21 saved regression
-specifications agree to numerical precision. All four rendered artifacts were
-visually inspected.
-Figures are replotted from data; supplied picture files are used only as visual
-references and are not read by the script.
+Table 3 uses all 16 technical templates: 12 single-turn templates plus the four
+conversation turns. Condition means are subtracted at full precision, then the
+final difference is rounded for display. `table3_comparison.csv` reports our
+rounded difference minus the published value for each cell. Published values
+are never substituted into the calculations.
 
-Paper source: [arXiv:2604.05051v1](https://arxiv.org/abs/2604.05051v1), pp. 5-8.
-Input data source: `code/outputs/evaluation/` and
-`code/outputs/baseline_evaluation/` in this repository, corresponding to
-`dataset/evaluation/` and `dataset/baseline_evaluation/` in the assignment bundle.
+Figure 2(b) uses only single-turn technical questions. Agreement means the two
+evidence-direction labels are equal, including `uncertain` paired with `uncertain`.
+Each condition contains 35,328 pairs across the eight models.
+
+Figure 3 fits a framing logistic regression separately for each single-turn
+question type. Its odds ratios come from statsmodels; confidence intervals and
+p-values use standard errors clustered by review, with 95% confidence by default.
+
+Figure 5 and every RQ3 regression use the same 363 reviews and the same two
+question types (Effectiveness and Efficacy) in both language styles. Each
+language/condition cell contains 5,808 pairs. This avoids mixing the paper's
+368-review technical population with its 363-review plain-language population,
+or mixing all 16 technical types with only two plain-language types.
+
+The RQ3 interaction uses `agreement ~ framed * plain`. Plain-language framing
+is also fitted separately; a coefficient pooled across language styles is not
+reported as a plain-only effect.
+
+## Results and outputs
+
+`data_post/` holds the calculated pair measurements in `response_metrics.csv`
+once the metric run is complete. Its existing partial files remain preserved.
+`outputs/` holds PNG/SVG versions of the table and three figures, their CSV
+values, the published-table comparison, sensitivity results and `regressions.json`.
+`not_replicated.txt` recaps the omitted procedures and methodological departures.

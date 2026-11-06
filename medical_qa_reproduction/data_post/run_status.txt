@@ -1,0 +1,18 @@
+Intermediate response metrics are stored here. Final tables, figures and
+regression results are retained in ../outputs/. No calculations were rerun
+when these directories were reorganized.
+
+The independent response-text metric calculation was stopped during the
+folder reorganization. Completed results cover:
+Claude Sonnet 4.5, GPT-5.1, HuatuoGPT-o1 7B, HuatuoGPT-o1 8B, Llama 3.3 70B,
+and Llama 4 Maverick 17B. Qwen3 4B and Qwen3 30B are not completed.
+
+partial_metrics/response_metrics_part1.csv contains the completed Claude pairs.
+partial_metrics/response_metrics_part2.csv contains the other five completed models.
+These are partial files, not a completed input for reproduce.py.
+
+The existing figures, tables, and regressions.json are retained from the earlier
+analysis. They have NOT been regenerated from independently extracted metrics
+or updated for the current rounding, matched-review, and clustered-error settings.
+
+No original input files under code/outputs/ were removed or changed.

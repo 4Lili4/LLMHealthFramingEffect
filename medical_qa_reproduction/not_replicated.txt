@@ -1,0 +1,57 @@
+Departures from the paper and what was not rerun
+=============================================
+
+1. We do not round each condition mean before subtracting them for Table 3.
+   We subtract the full-precision means, then round only the final display.
+   This avoids differences caused by premature rounding.
+
+2. We do not compare different review populations in the language analysis.
+   Both language styles use the same 363 reviews and the two shared question
+   types: Effectiveness and Efficacy. The paper's Figure 5 uses 368 technical
+   reviews but only 363 plain-language reviews.
+
+3. We do not mix all 16 technical templates with just two plain-language
+   templates when estimating the framing-by-language interaction. We use the
+   same two question types in both styles. The paper's reported interaction
+   appears to use the mismatched template populations.
+
+4. We do not label a framing coefficient pooled across language styles as a
+   plain-language-only result. The plain-language effect is fitted separately.
+
+5. We do not treat repeated observations from a review as independent when
+   calculating uncertainty. Standard errors, confidence intervals and p-values
+   are clustered by review. The paper reports ordinary unclustered errors.
+   This changes uncertainty estimates, not fitted logistic coefficients.
+
+6. We do not reuse the authors' saved cosine/entity scores or citation/number
+   lists. compute_metrics.py calculates these from the generated answer text.
+   The published Table 3 is only a comparison target; it does not supply values
+   to our calculations. We do not tune extraction rules to force a match.
+
+7. The paper does not fully specify answer-section extraction, the spaCy model,
+   citation/number regexes, entity normalization, or empty-set handling. We make
+   these choices explicit at the top of reproduce.py rather than claiming to
+   have recovered the authors' undocumented implementation. Current choices:
+   Full Answer where present; en_core_web_sm; lowercase entities; bracketed
+   article IDs; numbers excluding citations; zero overlap for two empty sets.
+   The alternative empty-overlap convention is included in the sensitivity CSV.
+
+8. We do not regenerate the LLM responses or evidence-direction judgments.
+   The assignment explicitly permits reusing both. We do not rebuild the
+   Cochrane dataset or retrain the pretrained PubMedBERT and spaCy models.
+
+9. We do not reproduce the separate RQ2 analyses/figures, which are outside
+   this assignment. Table 3 still includes the four conversation-turn templates
+   alongside the twelve single-turn templates, as in the original table scope.
+
+Data handling
+-------------
+The 48 required JSON input files are copied into this project's data_pre/ folder.
+The original files under code/outputs/ are retained and unchanged. Both Python
+scripts point at the copies. Intermediate response metrics belong in data_post/.
+Final tables, figures and regression results belong in outputs/. All tunable
+model and analysis settings are at the beginning of reproduce.py.
+
+The directory reorganization did not rerun calculations. The stopped independent
+metric run has partial results for six models under data_post/partial_metrics/.
+Existing plots/tables have not yet been refreshed for the new settings.
